@@ -1,0 +1,22 @@
+import { chromium } from "playwright-core";
+const browser = await chromium.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" });
+const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+const errors = [];
+page.on("pageerror", (e) => errors.push(String(e)));
+await page.goto("http://localhost:3000/", { waitUntil: "networkidle" });
+await page.waitForTimeout(800);
+await page.fill(".vb-tag__input", "Maya");
+const typed = await page.inputValue(".vb-tag__input");
+const head = await page.evaluate(() => {
+  const r = [...document.querySelectorAll(".vb-hero__bouquet .bq-breathe")].at(-1).getBoundingClientRect();
+  return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+});
+await page.mouse.click(head.x, head.y);
+await page.waitForTimeout(250);
+const label = await page.locator(".vb-hero__bouquet .rounded-xl").textContent().catch(() => null);
+await page.screenshot({ path: "lab/living/02-landing.png" });
+console.log(`${typed === "Maya" ? "PASS" : "FAIL"}  the name tag still takes typing`);
+console.log(`${label ? "PASS" : "FAIL"}  tapping a hero flower shows its meaning ("${label}")`);
+console.log(`${(await page.inputValue(".vb-tag__input")) === "Maya" ? "PASS" : "FAIL"}  tapping a flower doesn't disturb the tag`);
+if (errors.length) console.log("ERRORS:\n" + errors.join("\n"));
+await browser.close();

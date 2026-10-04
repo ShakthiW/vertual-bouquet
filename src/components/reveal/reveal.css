@@ -1,0 +1,326 @@
+/* The reveal. One clock, --t (seconds since the tap), is written by
+   RevealSequence; every element derives its own progress from it and the
+   --tl-* windows (lib/motion/presets.ts). transform + opacity + clip-path only. */
+
+.rv {
+  --t: 0;
+  --crack: clamp(0, calc((var(--t) - var(--tl-seal-a)) / (var(--tl-seal-b) - var(--tl-seal-a))), 1);
+  --open: clamp(0, calc((var(--t) - var(--tl-flap-a)) / (var(--tl-flap-b) - var(--tl-flap-a))), 1);
+  --open-e: calc(1 - (1 - var(--open)) * (1 - var(--open)) * (1 - var(--open)));
+  --exit: clamp(0, calc((var(--t) - var(--tl-exit-a)) / (var(--tl-exit-b) - var(--tl-exit-a))), 1);
+  --exit-e: calc(var(--exit) * var(--exit));
+  --bloom-p: clamp(0, calc((var(--t) - var(--tl-bloom-a)) / (var(--tl-bloom-b) - var(--tl-bloom-a))), 1);
+  --scene: clamp(0, calc((var(--t) - var(--tl-bloom-a) + 0.2) / 0.35), 1);
+  --name: clamp(0, calc((var(--t) - var(--tl-name-a)) / (var(--tl-name-b) - var(--tl-name-a))), 1);
+  --card: clamp(0, calc((var(--t) - var(--tl-card-a)) / (var(--tl-card-b) - var(--tl-card-a))), 1);
+  --card-e: calc(1 - (1 - var(--card)) * (1 - var(--card)) * (1 - var(--card)));
+  --sign: clamp(0, calc((var(--t) - var(--tl-sign-a)) / (var(--tl-sign-b) - var(--tl-sign-a))), 1);
+  --btn: clamp(0, calc((var(--t) - var(--tl-btn-a)) / (var(--tl-btn-b) - var(--tl-btn-a))), 1);
+  --skip: calc(clamp(0, calc((var(--t) - 1) / 0.3), 1) * (1 - var(--btn)));
+
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: radial-gradient(60% 50% at 50% 42%, #fff3ec, transparent 75%), #f8e8e8;
+}
+.rv[data-look="garden"] {
+  background: radial-gradient(60% 50% at 50% 42%, #fffaf0, transparent 75%), #eef0e4;
+}
+.rv[data-look="ink"] {
+  background: radial-gradient(60% 50% at 50% 42%, #ffffff, transparent 75%), #f4f2ef;
+}
+
+/* --------------------------------------------------------------- intro -- */
+.rv-intro {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1.5rem;
+  text-align: center;
+  opacity: calc(1 - var(--exit));
+  transform: translate3d(0, calc(var(--exit-e) * 32svh), 0);
+}
+.rv[data-state="playing"] .rv-intro,
+.rv[data-state="done"] .rv-intro {
+  pointer-events: none;
+}
+.rv-from,
+.rv-hint {
+  margin: 0;
+  opacity: calc(1 - var(--crack));
+}
+.rv-from {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.25rem, 3.4vw, 1.6rem);
+  color: var(--ink-soft);
+}
+.rv-hint {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.rv-float {
+  animation: rv-float 4.2s ease-in-out infinite alternate;
+}
+.rv[data-state="playing"] .rv-float,
+.rv[data-state="done"] .rv-float {
+  animation-play-state: paused;
+}
+@keyframes rv-float {
+  from { transform: translateY(-5px) rotate(-0.6deg); }
+  to { transform: translateY(5px) rotate(0.6deg); }
+}
+
+.rv-envelope {
+  position: relative;
+  display: block;
+  width: min(26rem, 82vw);
+  aspect-ratio: 1.48;
+  padding: 0;
+  border: 0;
+  background: none;
+  perspective: 1400px;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out-soft);
+}
+.rv-envelope:active {
+  transform: scale(0.98);
+}
+.rv-envelope:disabled {
+  cursor: progress;
+}
+.rv-envelope:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 6px;
+  border-radius: 0.6rem;
+}
+.rv-env-back,
+.rv-env-front,
+.rv-env-flap {
+  position: absolute;
+  border-radius: 0.5rem;
+}
+.rv-env-back {
+  inset: 0;
+  background: #e6cbc2;
+  box-shadow: 0 2px 4px rgb(60 20 30 / 0.12), 0 26px 50px -20px rgb(60 20 30 / 0.45);
+}
+.rv-env-front {
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 11%;
+  background: #f7e9e3;
+  clip-path: polygon(0 0, 50% 54%, 100% 0, 100% 100%, 0 100%);
+}
+.rv-env-to {
+  max-width: 82%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-caveat), cursive;
+  font-size: clamp(1.7rem, 6vw, 2.4rem);
+  color: var(--ink);
+}
+.rv-env-flap {
+  inset: 0 0 auto 0;
+  height: 58%;
+  z-index: 2;
+  background: linear-gradient(#f1ddd5, #e8cec5);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: 50% 0;
+  transform: rotateX(calc(var(--open-e) * 178deg));
+}
+.rv-seal {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 58%;
+  width: clamp(3.4rem, 12vw, 4.4rem);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+}
+.rv-seal-half {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #b3304f, #7c1531 70%);
+  box-shadow: 0 2px 6px rgb(60 10 25 / 0.4);
+  opacity: calc(1 - var(--crack) * 1.1);
+}
+.rv-seal-half--l {
+  clip-path: polygon(0 0, 54% 0, 44% 50%, 56% 100%, 0 100%);
+  transform: translate3d(calc(var(--crack) * -2.6rem), calc(var(--crack) * 3.4rem), 0) rotate(calc(var(--crack) * -34deg));
+}
+.rv-seal-half--r {
+  clip-path: polygon(54% 0, 100% 0, 100% 100%, 56% 100%, 44% 50%);
+  transform: translate3d(calc(var(--crack) * 2.6rem), calc(var(--crack) * 3.8rem), 0) rotate(calc(var(--crack) * 38deg));
+}
+.rv-seal-mark {
+  position: relative;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 1.7rem;
+  color: #f6d9df;
+  opacity: calc(1 - var(--crack) * 2.5);
+}
+
+/* --------------------------------------------------------------- scene -- */
+.rv-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: var(--scene);
+  pointer-events: none;
+}
+.rv-name {
+  position: absolute;
+  top: clamp(1.5rem, 6svh, 3.5rem);
+  left: 50%;
+  translate: -50% 0;
+  margin: 0;
+  max-width: 92vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-caveat), cursive;
+  font-size: clamp(2.4rem, 7vw, 4.2rem);
+  line-height: 1.15;
+  color: var(--ink);
+  /* Written left to right. */
+  /* Ends past the edge: handwriting overhangs its box. */
+  clip-path: inset(-25% calc((1 - var(--name)) * 110% - 10%) -25% -5%);
+}
+.rv-bouquet {
+  position: absolute;
+  left: 50%;
+  top: clamp(5.5rem, 15svh, 9rem);
+  height: min(68svh, 118vw);
+  aspect-ratio: 1000 / 1200;
+  translate: -50% 0;
+}
+.rv-petals {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+}
+
+/* Golden-hour light: a warm glow that drifts slowly once the bouquet is open. */
+.rv::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(38% 34% at 50% 50%, rgb(255 226 196 / 0.55), transparent 70%);
+  opacity: 0;
+  transition: opacity 1.6s ease;
+}
+.rv[data-state="done"]::before {
+  opacity: 1;
+  animation: rv-light 22s ease-in-out infinite alternate;
+}
+@keyframes rv-light {
+  from { transform: translate3d(-12%, -6%, 0); }
+  to { transform: translate3d(12%, 8%, 0); }
+}
+.rv-card {
+  position: absolute;
+  right: 4vw;
+  bottom: 12svh;
+  width: min(17rem, 60vw);
+  opacity: var(--card);
+  transform: translate3d(0, calc((1 - var(--card-e)) * 3rem), 0) rotate(-3deg);
+  font-size: clamp(0.8rem, 3.2vw, 0.95rem);
+}
+.rv-card .card-from {
+  clip-path: inset(-20% calc((1 - var(--sign)) * 110% - 10%) -20% -5%);
+}
+.rv-actions {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding-inline: 1rem;
+  opacity: var(--btn);
+  transform: translate3d(0, calc((1 - var(--btn)) * 10px), 0);
+  pointer-events: none;
+}
+.rv[data-state="done"] .rv-actions,
+.rv[data-state="done"] .rv-scene {
+  pointer-events: auto;
+}
+.rv-skip {
+  position: absolute;
+  z-index: 4;
+  right: 1rem;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  opacity: var(--skip);
+  visibility: hidden;
+}
+.rv[data-state="playing"] .rv-skip {
+  visibility: visible;
+}
+
+@media (min-width: 900px) {
+  .rv-bouquet {
+    translate: -62% 0;
+    top: 12svh;
+    height: 84svh;
+  }
+  .rv-card {
+    right: auto;
+    left: calc(50% + 1rem);
+    bottom: 15svh;
+    width: 20rem;
+    font-size: 1.05rem;
+  }
+  .rv-envelope {
+    width: min(30rem, 40vw);
+  }
+}
+
+/* Fewer and gentler: no travel, no wipes, a calm crossfade instead. */
+@media (prefers-reduced-motion: reduce) {
+  .rv-float,
+  .rv[data-state="done"]::before {
+    animation: none;
+  }
+  .rv-intro,
+  .rv-scene,
+  .rv-card,
+  .rv-actions {
+    transform: none;
+    transition: opacity 600ms ease;
+  }
+  .rv-card {
+    transform: rotate(-3deg);
+  }
+  .rv-env-flap,
+  .rv-seal-half {
+    transform: none;
+  }
+  .rv-name,
+  .rv-card .card-from {
+    clip-path: none;
+  }
+}

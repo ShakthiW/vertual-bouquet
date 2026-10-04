@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +40,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scroll-craft build workspace: local tooling and screenshots
+scrollcraft/builds/*/node_modules/
+scrollcraft/builds/*/lab/
+scrollcraft/builds/*/package*.json
+
+# local development bouquet store
+.data/

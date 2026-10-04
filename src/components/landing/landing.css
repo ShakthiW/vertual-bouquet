@@ -1,0 +1,870 @@
+/* Landing page: split stage.
+   --split (0..50, unitless vw) is written by Landing.tsx from scroll position.
+   Everything that depends on the divider reads it with transforms only. */
+
+:root {
+  --sc-canvas: #fbf3f1;
+  --sc-surface: #ffffff;
+  --sc-ink: #2a1219;
+  --sc-ink-soft: #6e4f57;
+  --sc-accent: #b8325e;
+  --sc-accent-ink: #fff7f8;
+  --sc-font-display: var(--font-fraunces), Georgia, serif;
+  --sc-font-text: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+.vb {
+  --gut: clamp(1.25rem, 4vw, 4.5rem);
+  --bq-ground: #fbf3f1;
+  --tx-ground: #eceff3;
+  --tx-ink: #262b33;
+  --tx-soft: #59616d;
+  --shift-w: 50;
+  position: relative;
+  overflow-x: clip;
+  color: var(--ink);
+  background: var(--bq-ground);
+}
+
+.vb-act {
+  position: relative;
+}
+
+/* ------------------------------------------------------------ the sides -- */
+.vb-side--bq {
+  background: var(--bq-ground);
+}
+.vb-stage > .vb-side--bq,
+.vb-hero > .vb-side--bq {
+  position: absolute;
+  inset: 0;
+}
+
+.vb-side--text {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 50vw;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  background: var(--tx-ground);
+  color: var(--tx-ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  transform: translate3d(calc((var(--split, 50) - 50) * 1vw), 0, 0);
+}
+
+/* Text-side content hugs the divider so it stays visible as the side shrinks. */
+.vb-text-col {
+  margin-left: auto;
+  padding-right: var(--gut);
+  width: min(24rem, calc(42vw - var(--gut)));
+}
+
+/* Bouquet-side content stays centred in whatever the divider leaves. */
+.vb-shift {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc((100 - var(--shift-w)) * 1vw);
+  width: calc(var(--shift-w) * 1vw);
+  padding-inline: var(--gut);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transform: translate3d(calc((var(--split, 50) / 2 - 50 + var(--shift-w) / 2) * 1vw), 0, 0);
+}
+
+/* ----------------------------------------------------------- the divider -- */
+.vb-divider {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  z-index: 40;
+  pointer-events: none;
+  transform: translate3d(calc(var(--split, 50) * 1vw), 0, 0);
+  opacity: clamp(0, calc(var(--split, 50) / 3), 1);
+}
+.vb-divider::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -0.5px;
+  width: 1px;
+  background: color-mix(in oklab, var(--ink) 16%, transparent);
+}
+.vb-divider__label {
+  position: absolute;
+  top: 1.1rem;
+  white-space: nowrap;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.vb-divider__label--text {
+  right: 0.85rem;
+  color: var(--tx-soft);
+}
+.vb-divider__label--bq {
+  left: 0.85rem;
+  color: var(--ink-soft);
+}
+.vb-divider__dot {
+  position: absolute;
+  top: 3rem;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 3px rgb(42 18 25 / 0.3);
+  transform: translate3d(0, calc(var(--page-p, 0) * (100svh - 5rem)), 0);
+}
+
+/* ------------------------------------------------------------------ type -- */
+.vb-wordmark {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+}
+.vb-h1 {
+  margin: 0.6rem 0 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 420;
+  font-size: clamp(2.3rem, 3.8vw, 4.1rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+  font-variation-settings: "SOFT" 100, "opsz" 144;
+}
+.vb-h2 {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 420;
+  font-size: clamp(1.9rem, 3vw, 3.1rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  font-variation-settings: "SOFT" 100, "opsz" 144;
+}
+.vb-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  color: var(--tx-soft);
+  text-align: right;
+}
+
+.vb-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0 1.5rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-weight: 560;
+  font-size: 1rem;
+  white-space: nowrap;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgb(90 20 40 / 0.25), 0 8px 20px -6px rgb(150 30 70 / 0.45),
+    inset 0 1px 0 rgb(255 255 255 / 0.18);
+  transition: transform 140ms var(--ease-out-soft), background-color 160ms var(--ease-out-soft);
+}
+.vb-cta:active {
+  transform: scale(0.97);
+}
+@media (hover: hover) and (pointer: fine) {
+  .vb-cta:hover {
+    background: #a3284f;
+  }
+}
+
+/* The grey bubble: a text, exactly as flat as it is. */
+.vb-bubble {
+  margin: 0 0 0 auto;
+  width: fit-content;
+  max-width: 15rem;
+  padding: 0.6rem 0.95rem;
+  border-radius: 1.15rem 1.15rem 0.3rem 1.15rem;
+  background: #d9dee6;
+  color: var(--tx-ink);
+  font-size: 1.02rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+/* Scroll-driven entrance that arrives and stays. Used inside pinned acts
+   instead of engine cues, so a stage never slides away empty. */
+.vb-arrive {
+  --a: clamp(0, calc((var(--sc-p, 1) - var(--at, 0)) * 9), 1);
+  opacity: var(--a);
+  transform: translate3d(0, calc((1 - var(--a)) * 14px), 0);
+}
+
+/* ------------------------------------------------------------ 1. hero -- */
+.vb-hero {
+  height: 100svh;
+  min-height: 600px;
+  overflow: clip;
+}
+.vb-hero__head {
+  position: absolute;
+  z-index: 3;
+  top: clamp(4.5rem, 13vh, 8rem);
+  left: calc(50vw + var(--gut));
+  width: calc(50vw - 2 * var(--gut));
+  max-width: 34rem;
+}
+.vb-hero__head .vb-cta {
+  margin-top: 1.6rem;
+}
+.vb-hero__bouquet {
+  position: absolute;
+  z-index: 2;
+  right: calc(var(--gut) * 0.6);
+  bottom: -7svh;
+  height: min(80svh, 52vw);
+  aspect-ratio: 1000 / 1200;
+}
+.vb-hero__bouquet > svg {
+  width: 100%;
+  height: 100%;
+}
+.vb-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(55% 60% at 72% 42%, rgb(255 236 220 / 0.95), transparent 70%);
+  animation: vb-glow 9s ease-in-out infinite alternate;
+}
+@keyframes vb-glow {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+.vb-far,
+.vb-near {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.vb-far > svg,
+.vb-near > svg {
+  position: absolute;
+  max-width: none;
+}
+.vb-far__a { width: 30vw; right: -7vw; top: -5vh; opacity: 0.32; filter: blur(10px); }
+.vb-far__b { width: 15vw; left: 55vw; top: 50vh; opacity: 0.22; filter: blur(7px); }
+.vb-far__c { width: 11vw; right: 34vw; top: 2vh; opacity: 0.2; filter: blur(8px); }
+.vb-near {
+  z-index: 6;
+}
+.vb-near__a { width: 17vw; left: 41vw; bottom: -16vh; opacity: 0.9; filter: blur(3px); transform: rotate(-24deg); }
+.vb-near__b { width: 15vw; right: -4vw; bottom: -9vh; opacity: 0.85; filter: blur(4px); }
+
+/* The tag hanging from the bow: the visitor's one input. */
+.vb-tag {
+  position: absolute;
+  left: 57%;
+  top: 76.5%;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem 0.4rem 1.1rem;
+  background: #fffdf9;
+  border-radius: 0.3rem 0.6rem 0.6rem 0.3rem;
+  box-shadow: 0 2px 4px rgb(60 20 30 / 0.12), 0 10px 22px -10px rgb(60 20 30 / 0.35);
+  transform: rotate(-6deg);
+  font-family: var(--font-caveat), cursive;
+  color: var(--ink);
+  cursor: text;
+}
+.vb-tag::before {
+  content: "";
+  position: absolute;
+  left: 0.4rem;
+  top: 50%;
+  width: 0.35rem;
+  height: 0.35rem;
+  margin-top: -0.18rem;
+  border-radius: 50%;
+  background: var(--canvas);
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.2);
+}
+.vb-tag__for {
+  font-size: 1.35rem;
+  color: var(--ink-soft);
+}
+.vb-tag__input {
+  width: 8.5rem;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 1.7rem;
+  line-height: 1.1;
+  color: var(--ink);
+  outline: none;
+}
+.vb-tag__input::placeholder {
+  color: color-mix(in oklab, var(--ink-soft) 70%, transparent);
+}
+.vb-tag:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.vb-hero__text {
+  margin-top: 8vh;
+}
+
+/* ---------------------------------------------------------- 2. buried -- */
+.vb-buried {
+  --n: calc(var(--sc-p, 0) * 8.6);
+}
+.vb-meanings {
+  gap: 2.2rem;
+}
+.vb-meanings__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.4rem 1.6rem;
+  max-width: 34rem;
+}
+.vb-meaning {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+.vb-meaning p {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.3;
+  color: var(--ink-soft);
+}
+.vb-meaning__icon {
+  flex: none;
+  width: 4.6rem;
+  height: 4.6rem;
+}
+.vb-meaning__name {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 1.25rem;
+  color: var(--ink);
+}
+
+.vb-pile__stack {
+  position: relative;
+  height: 25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent);
+  mask-image: linear-gradient(to bottom, #000 72%, transparent);
+}
+.vb-note {
+  position: absolute;
+  inset: 0 0 auto 0;
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 0.95rem;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(30 40 60 / 0.08), 0 6px 14px -8px rgb(30 40 60 / 0.25);
+  font-size: 0.86rem;
+  line-height: 1.3;
+  opacity: clamp(0, calc(var(--n) - var(--k)), 1);
+  transform: translate3d(0, calc(max(0, calc(var(--n) - 1 - var(--k))) * 4.15rem), 0);
+}
+.vb-note__app {
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: var(--tx-soft);
+}
+.vb-pile__mine {
+  position: absolute;
+  inset: 0 0 auto 0;
+  opacity: clamp(0, calc(1 - (var(--n) - 4) / 2.5), 1);
+  transform: translate3d(0, calc(var(--n) * 4.15rem), 0);
+}
+.vb-text-note {
+  margin: 1.4rem 0 0;
+  font-size: 1.15rem;
+  line-height: 1.35;
+  color: var(--tx-ink);
+  text-align: right;
+  text-wrap: balance;
+}
+
+/* --------------------------------------------------------- 3. silence -- */
+.vb-silence {
+  height: 95svh;
+}
+.vb-silence > .vb-side--bq {
+  position: relative;
+  height: 100%;
+}
+.vb-script-name {
+  margin: 0;
+  font-family: var(--font-caveat), cursive;
+  font-size: clamp(3rem, 6.5vw, 6.5rem);
+  line-height: 1;
+  color: var(--ink);
+  transform: rotate(-4deg);
+  overflow-wrap: anywhere;
+}
+.vb-seen {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--tx-soft);
+  text-align: right;
+}
+
+/* ------------------------------------------------------------ 4. peak -- */
+.vb-peak {
+  --crack: clamp(0, calc((var(--sc-p, 0) - 0.1) * 10), 1);
+  --open: clamp(0, calc((var(--sc-p, 0) - 0.19) * 7), 1);
+  --exit: clamp(0, calc((var(--sc-p, 0) - 0.31) * 8), 1);
+  --rise: clamp(0, calc((var(--sc-p, 0) - 0.3) * 7), 1);
+  --card: clamp(0, calc((var(--sc-p, 0) - 0.62) * 9), 1);
+}
+.vb-peak__col {
+  align-items: center;
+}
+.vb-envelope {
+  position: relative;
+  width: min(30rem, 34vw);
+  aspect-ratio: 1.48;
+  perspective: 1400px;
+  opacity: calc(1 - var(--exit));
+  transform: translate3d(0, calc(var(--exit) * 45%), 0);
+}
+.vb-envelope__back,
+.vb-envelope__front,
+.vb-envelope__flap {
+  position: absolute;
+  border-radius: 0.45rem;
+}
+.vb-envelope__back {
+  inset: 0;
+  background: #e6cbc2;
+  box-shadow: 0 2px 4px rgb(60 20 30 / 0.12), 0 24px 50px -20px rgb(60 20 30 / 0.45);
+}
+.vb-envelope__front {
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 13%;
+  background: #f7e9e3;
+  clip-path: polygon(0 0, 50% 54%, 100% 0, 100% 100%, 0 100%);
+}
+.vb-envelope__to {
+  font-family: var(--font-caveat), cursive;
+  font-size: clamp(1.6rem, 2.4vw, 2.4rem);
+  color: var(--ink);
+  max-width: 80%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.vb-envelope__flap {
+  inset: 0 0 auto 0;
+  height: 58%;
+  z-index: 2;
+  background: linear-gradient(#f1ddd5, #ead1c8);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: 50% 0;
+  transform: rotateX(calc(var(--open) * 178deg));
+}
+.vb-seal {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 58%;
+  width: clamp(3.2rem, 4.6vw, 4.4rem);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+}
+.vb-seal__half {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #b3304f, #7c1531 70%);
+  box-shadow: 0 2px 6px rgb(60 10 25 / 0.4);
+}
+.vb-seal__half--l {
+  clip-path: polygon(0 0, 54% 0, 44% 50%, 56% 100%, 0 100%);
+  transform: translate3d(calc(var(--crack) * -2.4rem), calc(var(--crack) * 3.2rem), 0) rotate(calc(var(--crack) * -32deg));
+  opacity: calc(1 - var(--crack) * 1.1);
+}
+.vb-seal__half--r {
+  clip-path: polygon(54% 0, 100% 0, 100% 100%, 56% 100%, 44% 50%);
+  transform: translate3d(calc(var(--crack) * 2.4rem), calc(var(--crack) * 3.6rem), 0) rotate(calc(var(--crack) * 36deg));
+  opacity: calc(1 - var(--crack) * 1.1);
+}
+.vb-seal__mark {
+  position: relative;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-style: italic;
+  font-size: 1.6rem;
+  color: #f6d9df;
+  opacity: calc(1 - var(--crack) * 2.5);
+}
+
+.vb-peak__bouquet {
+  position: absolute;
+  left: 50%;
+  bottom: 2svh;
+  height: min(84svh, 62vw);
+  aspect-ratio: 1000 / 1200;
+  opacity: var(--rise);
+  transform: translate3d(-50%, calc((1 - var(--rise)) * 16%), 0);
+}
+.vb-peak__bouquet > svg {
+  width: 100%;
+  height: 100%;
+}
+/* The bloom itself is shared with the recipient's reveal (globals.css):
+   here scroll progress drives it. */
+.vb-peak {
+  --bloom-p: var(--sc-p, 0);
+}
+
+.vb-card {
+  position: absolute;
+  right: 5%;
+  bottom: 13%;
+  width: min(15rem, 19vw);
+  padding: 1rem 1.2rem 1.1rem;
+  background: #fffdf9;
+  border-radius: 0.35rem;
+  box-shadow: 0 2px 4px rgb(60 20 30 / 0.1), 0 16px 34px -14px rgb(60 20 30 / 0.4);
+  font-family: var(--font-caveat), cursive;
+  color: var(--ink);
+  opacity: var(--card);
+  transform: translate3d(0, calc((1 - var(--card)) * 2.5rem), 0) rotate(-3deg);
+}
+.vb-card p {
+  margin: 0;
+}
+.vb-card__to {
+  font-size: 1.5rem;
+}
+.vb-card__msg {
+  margin-top: 0.3rem !important;
+  font-size: 1.35rem;
+  line-height: 1.15;
+}
+.vb-card__from {
+  margin-top: 0.4rem !important;
+  text-align: right;
+  font-size: 1.5rem;
+}
+.vb-peak__line {
+  position: absolute;
+  left: var(--gut);
+  top: clamp(4rem, 11vh, 7rem);
+  max-width: 13ch;
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(1.6rem, 2.4vw, 2.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+/* ------------------------------------------------------------- 5. how -- */
+.vb-how > .vb-side--bq {
+  position: relative;
+  padding-block: clamp(5rem, 14vh, 9rem);
+}
+.vb-how__grid {
+  margin-left: calc(26vw + var(--gut));
+  margin-right: var(--gut);
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  column-gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: start;
+}
+.vb-how__title {
+  grid-column: 1 / -1;
+  max-width: 18ch;
+}
+.vb-how__steps {
+  margin: 3rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+}
+.vb-how__steps li {
+  min-height: 7.5rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--hairline);
+}
+.vb-how__steps h3 {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 450;
+  font-size: 1.45rem;
+  letter-spacing: -0.015em;
+}
+.vb-how__steps p {
+  margin: 0.35rem 0 0;
+  max-width: 36ch;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.vb-how__figure {
+  grid-column: 2;
+  grid-row: 2 / span 2;
+  margin: 1.5rem 0 0;
+  width: 100%;
+  max-width: 24rem;
+  justify-self: end;
+}
+.vb-how__facts {
+  margin: 1.8rem 0 0;
+  font-weight: 560;
+  color: var(--ink);
+}
+.vb-how .vb-text-col {
+  align-self: stretch;
+  width: calc(26vw - var(--gut));
+  padding-top: calc(clamp(5rem, 14vh, 9rem) + 3rem + 2 * 3.2rem);
+}
+.vb-how > .vb-side--text {
+  align-items: flex-start;
+}
+.vb-how__text {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: right;
+}
+.vb-how__text li {
+  min-height: 7.5rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid color-mix(in oklab, var(--tx-ink) 12%, transparent);
+  color: var(--tx-ink);
+}
+
+/* ----------------------------------------------------------- 6. close -- */
+.vb-close__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  padding-inline: var(--gut);
+}
+.vb-close__copy {
+  max-width: 34rem;
+}
+.vb-close__copy .vb-h2 {
+  font-size: clamp(2.3rem, 4.2vw, 4.4rem);
+}
+.vb-close__sub {
+  margin: 1rem 0 1.8rem;
+  font-size: 1.1rem;
+  color: var(--ink-soft);
+}
+.vb-close__bouquet {
+  justify-self: end;
+  height: min(88svh, 52vw);
+  aspect-ratio: 1000 / 1200;
+}
+.vb-close__bouquet > svg {
+  width: 100%;
+  height: 100%;
+}
+.vb-typing {
+  font-style: italic;
+}
+
+/* ----------------------------------------------------------- phones -- */
+@media (max-width: 760px) {
+  .vb {
+    --gut: 1.1rem;
+    --shift-w: 56;
+  }
+  .vb-text-col {
+    padding-right: 0.7rem;
+    width: calc(30vw - 0.7rem);
+  }
+  .vb-bubble {
+    font-size: 0.86rem;
+    padding: 0.5rem 0.7rem;
+  }
+  .vb-divider__label {
+    top: 0.75rem;
+    font-size: 0.68rem;
+  }
+
+  .vb-hero__head {
+    left: var(--gut);
+    right: var(--gut);
+    width: auto;
+    top: 3.2rem;
+    z-index: 7;
+  }
+  .vb-h1 {
+    font-size: clamp(2.1rem, 9vw, 2.6rem);
+  }
+  .vb-hero__head .vb-cta {
+    margin-top: 1.1rem;
+  }
+  /* On a phone the bouquet steps in front of the divider: the subject
+     overlaps both sides, and the bubble moves up out of its way. */
+  .vb-hero__bouquet {
+    z-index: 6;
+    right: -8vw;
+    height: 58svh;
+    bottom: -6svh;
+  }
+  .vb-hero__text {
+    margin-top: -6svh;
+  }
+  .vb-tag {
+    left: 40%;
+    padding-left: 0.95rem;
+  }
+  .vb-tag__input {
+    width: 6.5rem;
+    font-size: 1.45rem;
+  }
+  .vb-far__a { width: 60vw; }
+  .vb-far__b { display: none; }
+  .vb-near__a { width: 30vw; left: 30vw; }
+  .vb-near__b { width: 28vw; }
+
+  .vb-buried .vb-text-col { width: calc(36vw - 0.7rem); }
+  .vb-meanings {
+    gap: 1.4rem;
+  }
+  .vb-meanings__list {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+  .vb-meaning__icon {
+    width: 3rem;
+    height: 3rem;
+  }
+  .vb-meaning p {
+    font-size: 0.92rem;
+  }
+  .vb-note {
+    font-size: 0.72rem;
+    padding: 0.45rem 0.55rem;
+  }
+  .vb-text-note {
+    font-size: 0.85rem;
+  }
+
+  .vb-envelope {
+    width: 52vw;
+  }
+  .vb-peak__bouquet {
+    height: 66svh;
+  }
+  .vb-card {
+    width: 36vw;
+    right: 0;
+    bottom: 8%;
+    padding: 0.7rem 0.8rem 0.8rem;
+  }
+  .vb-card__to,
+  .vb-card__from {
+    font-size: 1.2rem;
+  }
+  .vb-card__msg {
+    font-size: 1.1rem;
+  }
+  .vb-peak__line {
+    left: var(--gut);
+    max-width: 11ch;
+    font-size: 1.45rem;
+  }
+  .vb-peak .vb-text-col {
+    width: calc(12vw - 0.2rem);
+    padding-right: 0.3rem;
+  }
+  .vb-peak .vb-seen {
+    font-size: 0.7rem;
+  }
+  .vb-peak .vb-seen .vb-meta {
+    display: none;
+  }
+
+  .vb-how__grid {
+    margin-left: calc(24vw + var(--gut));
+    grid-template-columns: 1fr;
+  }
+  .vb-how__figure {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+    max-width: 14rem;
+  }
+  .vb-how .vb-text-col {
+    width: calc(24vw - 0.7rem);
+    font-size: 0.85rem;
+  }
+
+  .vb-close__grid {
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: 1rem;
+  }
+  .vb-close__bouquet {
+    justify-self: center;
+    height: 48svh;
+    order: -1;
+  }
+}
+
+/* Short phones: keep the name tag (the page's one input) on screen. */
+@media (max-width: 760px) and (max-height: 700px) {
+  .vb-hero__bouquet {
+    height: 50svh;
+    bottom: 1svh;
+  }
+}
+
+/* -------------------------------------------------- reduced motion -- */
+@media (prefers-reduced-motion: reduce) {
+  .vb-glow {
+    animation: none;
+  }
+  .vb-envelope {
+    display: none;
+  }
+  .vb-peak__bouquet {
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0);
+  }
+  .vb-card {
+    opacity: 1;
+    transform: rotate(-3deg);
+  }
+  .vb-note {
+    opacity: 1;
+    transform: translate3d(0, calc((6 - var(--k)) * 4.15rem), 0);
+  }
+  .vb-pile__mine {
+    opacity: 0.35;
+    transform: translate3d(0, calc(7 * 4.15rem), 0);
+  }
+  .vb-arrive {
+    transform: none;
+  }
+}

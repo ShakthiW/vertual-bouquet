@@ -1,26 +1,261 @@
+/* Layer order. scroll-craft's reset sits below components and utilities, so it
+   can never override a Tailwind class. (Unlayered, it beat every utility, and
+   after navigating from the landing page the current step's label inherited
+   dark ink on a dark pill.) */
+@layer theme, base, scrollcraft, components, utilities;
+
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------ tokens --
+   Palette: petal-white ground, deep wine ink, one rose accent, sage for
+   foliage. Deliberately not cream-and-brass. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --canvas: #fbf5f4;
+  --surface: #ffffff;
+  --ink: #2a1219;
+  --ink-soft: #6e4f57;
+  --accent: #b8325e;
+  --accent-ink: #fff7f8;
+  --sage: #6f8a6e;
+  --midnight: #15142a;
+  --hairline: color-mix(in oklab, var(--ink) 12%, transparent);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-sage: var(--sage);
+  --color-midnight: var(--midnight);
+  --color-hairline: var(--hairline);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-fraunces);
+  --font-script: var(--font-caveat);
+  --font-script-alt: var(--font-dancing);
+
+  --ease-out-soft: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------- bouquet --
+   Fill roles. Flower art never hard-codes a colour: it uses these classes, and
+   each flower sets the variables from its catalog colour. Ink style rewires the
+   same variables to paper + line, so B&W needs no separate art. */
+.bq .f-petal { fill: var(--petal); }
+.bq .f-shade { fill: var(--petal-shade); }
+.bq .f-light { fill: var(--petal-light); }
+.bq .f-center { fill: var(--center); }
+.bq .f-center-dark { fill: var(--center-dark, var(--center)); }
+.bq .f-leaf { fill: var(--leaf); }
+.bq .f-leaf-dark { fill: var(--leaf-dark); }
+.bq .e-shade { stroke: var(--petal-shade); stroke-width: 1.2; stroke-linejoin: round; }
+.bq .s-shade { fill: none; stroke: var(--petal-shade); }
+.bq .s-center { fill: none; stroke: var(--center-dark, var(--center)); }
+.bq .s-stem { fill: none; stroke: var(--stem); stroke-linecap: round; }
+.bq .f-paper { fill: var(--paper); }
+.bq .f-paper-shade { fill: var(--paper-shade); }
+.bq .f-ribbon { fill: var(--ribbon); }
+.bq .f-ribbon-shade { fill: var(--ribbon-shade); }
+
+.bq {
+  --leaf: #7f9c74;
+  --leaf-dark: #5d7a57;
+  --stem: #6c8a5c;
+}
+
+.bq[data-style="garden"] {
+  --leaf: #6f9160;
+  --leaf-dark: #4f6f45;
+  --stem: #5f7d4f;
+}
+
+.bq[data-style="ink"] {
+  --ink-paper: #fffdfb;
+  --ink-line: #231a1d;
+}
+.bq[data-style="ink"] * {
+  --petal: var(--ink-paper);
+  --petal-shade: var(--ink-paper);
+  --petal-light: var(--ink-paper);
+  --center: var(--ink-paper);
+  --center-dark: var(--ink-line);
+  --leaf: var(--ink-paper);
+  --leaf-dark: var(--ink-paper);
+  --stem: var(--ink-line);
+  --paper: var(--ink-paper);
+  --paper-shade: var(--ink-paper);
+  --ribbon: var(--ink-paper);
+  --ribbon-shade: var(--ink-paper);
+}
+.bq[data-style="ink"] :is(path, circle, ellipse, rect) {
+  stroke: var(--ink-line);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+.bq[data-style="ink"] .s-shade,
+.bq[data-style="ink"] .s-center {
+  stroke: var(--ink-line);
+}
+
+/* Living motion. Each flower (stem + head) sways around the shared binding
+   point; its own period and phase come from inline variables so no two flowers
+   ever move in sync. */
+.bq-sway {
+  transform-box: view-box;
+  transform-origin: var(--bind-x, 500px) var(--bind-y, 930px);
+  animation: bq-sway var(--sway-dur, 4s) ease-in-out var(--sway-delay, 0s) infinite alternate;
+}
+/* Gusts and pointer lean, added on top of the sway. `rotate` is a separate
+   property from `transform`, so it composes with the sway animation, around
+   the same binding point. --gust is shared (set on the svg); --lean is per
+   flower. Both are written by LivingBouquet and stay 0 when it is not used. */
+.bq-sway {
+  rotate: calc((var(--gust, 0) * var(--gust-k, 1) + var(--lean, 0)) * 1deg);
+}
+
+.bq-breathe {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bq-breathe var(--breathe-dur, 5s) ease-in-out var(--sway-delay, 0s) infinite alternate;
+}
+.bq-gust {
+  transform-box: view-box;
+  transform-origin: var(--bind-x, 500px) var(--bind-y, 930px);
+}
+
+@keyframes bq-sway {
+  from { transform: rotate(calc(var(--sway-amp, 2deg) * -1)); }
+  to { transform: rotate(var(--sway-amp, 2deg)); }
+}
+@keyframes bq-breathe {
+  from { transform: scale(1); }
+  to { transform: scale(1.02); }
+}
+
+/* Studio: hit areas over each flower, and the soft ring on the selected one. */
+.studio-hit {
+  fill: transparent;
+  cursor: grab;
+  outline: none;
+}
+.studio-hit:active {
+  cursor: grabbing;
+}
+.studio-hit:focus-visible {
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-dasharray: 6 8;
+}
+.studio-ring {
+  fill: color-mix(in oklab, #fff 18%, transparent);
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-dasharray: 10 9;
+  animation: studio-march 1.6s linear infinite;
+}
+@keyframes studio-march {
+  to { stroke-dashoffset: -38; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .studio-ring { animation: none; }
+}
+
+/* Studio: flowers glide to new spots on Arrange / Shuffle / Undo. Stems morph
+   where the browser can transition `d` (not Safari, where they snap). */
+.bq-glide .bq-pos {
+  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bq-glide .bq-stem {
+  transition: d 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .bq-glide .bq-pos,
+  .bq-glide .bq-stem {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------ bloom --
+   Shared by the landing page (driven by scroll) and the recipient's reveal
+   (driven by time). Whatever drives it sets --bloom-p from 0 to 1; each flower
+   carries its own start (--bs) and grows in over a short window:
+     stems draw, the head pops with a small overshoot and untwists, the outer
+     petals open after it. Optionally the wrap slides up and the bow ties. */
+.bq-bloomable .bq-bloom {
+  --lp: clamp(0, calc((var(--bloom-p, 1) - var(--bs, 0)) * 9), 1);
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  opacity: min(1, calc(var(--lp) * 3));
+  transform: scale(calc(0.35 + 0.65 * var(--lp) + sin(calc(var(--lp) * 3.14159rad)) * 0.12))
+    rotate(calc((1 - var(--lp)) * -50deg));
+}
+.bq-bloomable .bq-bloom [data-part="petals-outer"] {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transform: scale(calc(0.8 + 0.2 * var(--lp, 1))) rotate(calc((1 - var(--lp, 1)) * 24deg));
+}
+.bq-bloomable .bq-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: calc(1 - clamp(0, calc((var(--bloom-p, 1) - var(--bs, 0) + 0.08) * 9), 1));
+}
+.bq-wrap-in [data-part="wrap-front"],
+.bq-wrap-in [data-part="wrap-back"] {
+  --wp: clamp(0, calc((var(--bloom-p, 1) - 0.6) * 5), 1);
+  --we: calc(1 - (1 - var(--wp)) * (1 - var(--wp)) * (1 - var(--wp)));
+  opacity: var(--wp);
+  transform: translateY(calc((1 - var(--we)) * 170px));
+}
+.bq-wrap-in [data-part="ribbon"] {
+  --rp: clamp(0, calc((var(--bloom-p, 1) - 0.8) * 6), 1);
+  transform-box: fill-box;
+  transform-origin: 50% 25%;
+  opacity: var(--rp);
+  transform: scale(calc(0.3 + 0.7 * var(--rp) + sin(calc(var(--rp) * 3.14159rad)) * 0.18));
+}
+@media (prefers-reduced-motion: reduce) {
+  .bq-bloomable .bq-bloom,
+  .bq-bloomable .bq-bloom [data-part="petals-outer"],
+  .bq-wrap-in [data-part] {
+    opacity: 1;
+    transform: none;
+  }
+  .bq-bloomable .bq-draw {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes vb-open {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+.bq[data-still="true"] .bq-sway,
+.bq[data-still="true"] .bq-breathe {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bq-sway,
+  .bq-breathe {
+    animation: none;
+  }
 }

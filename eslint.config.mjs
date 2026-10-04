@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Third-party code kept byte-for-byte (scroll-craft engine).
+    "src/vendor/**",
+    // scroll-craft build workspace (briefs, verification scripts, screenshots).
+    "scrollcraft/**",
   ]),
 ]);
 
