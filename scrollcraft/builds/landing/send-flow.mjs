@@ -48,7 +48,7 @@ check("after a reload the share sheet is still there (no accidental resend)", (a
 // What a chat app sees when it fetches the link (bots get metadata in <head>).
 const html = await (await fetch(link, { headers: { "user-agent": "WhatsApp/2.24.1 A" } })).text();
 const meta = (p) => html.match(new RegExp(`<meta (?:property|name)="${p}" content="([^"]*)"`))?.[1];
-check(`og:title = "${meta("og:title")}"`, meta("og:title") === "Shakthi sent you a bouquet 🌷");
+check(`og:title = "${meta("og:title")}"`, meta("og:title") === "Shakthi sent you a posy 🌷");
 check(`og:description = "${meta("og:description")}"`, meta("og:description")?.includes("For Maya"));
 check(`robots = "${meta("robots")}"`, meta("robots")?.includes("noindex"));
 const ogImage = meta("og:image");
@@ -56,7 +56,7 @@ check(`og:image is absolute (${ogImage})`, ogImage?.startsWith("http"));
 if (ogImage) {
   const img = await fetch(ogImage.replace(/&amp;/g, "&"));
   fs.writeFileSync(`${out}/og.png`, Buffer.from(await img.arrayBuffer()));
-  check(`og:image responds ${img.status} ${img.headers.get("content-type")}`, img.ok && img.headers.get("content-type") === "image/png");
+  check(`og:image responds ${img.status} ${img.headers.get("content-type")}`, img.ok && img.headers.get("content-type") === "image/jpeg" && Number(img.headers.get("content-length") ?? 0) < 300_000);
 }
 
 // The recipient.

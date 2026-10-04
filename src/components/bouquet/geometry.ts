@@ -4,6 +4,9 @@ import { CATALOG } from "@/lib/flowers/catalog";
 
 const round = (n: number) => Math.round(n * 10) / 10;
 
+/** The leaf drawn on each stem, pointing along +x from (0,0). */
+export const LEAF = "M0 0 C14 -12 36 -12 56 0 C36 9 14 9 0 0Z";
+
 export function headOf(f: FlowerPlacement) {
   return {
     x: f.x * FRAME.width,

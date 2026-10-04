@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { SITE } from "@/lib/site";
 
 // Self-hosted (SIL Open Font License) so builds never depend on reaching
 // Google Fonts, and the OG image renderer can reuse the same files.
@@ -44,11 +45,13 @@ function siteUrl() {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: {
-    default: "Virtual Bouquet",
-    template: "%s · Virtual Bouquet",
+    default: `${SITE.name}: ${SITE.tagline}`,
+    template: `%s · ${SITE.name}`,
   },
-  description:
-    "Make a bouquet of flowers, write a card, and send it to someone you care about. Free, no account.",
+  applicationName: SITE.name,
+  description: SITE.description,
+  openGraph: { siteName: SITE.name, type: "website" },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {

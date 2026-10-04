@@ -5,6 +5,7 @@ import { newSeed } from "@/lib/arrange/prng";
 import { clearDraft } from "./state";
 import { useStudio } from "./StudioProvider";
 import { Pill, PrimaryButton } from "./ui";
+import { SITE } from "@/lib/site";
 
 const noop = () => () => {};
 /** The page's own origin, read only in the browser (null during server render). */
@@ -21,7 +22,7 @@ export function SendSheet() {
 
   const url = origin ? `${origin}/b/${sent.id}` : `/b/${sent.id}`;
   const manageUrl = origin ? `${origin}/m/${sent.manageToken}` : `/m/${sent.manageToken}`;
-  const text = `${card.from} made you a bouquet 🌷`;
+  const text = SITE.sharedTitle(card.from);
 
   const copy = async (what: "link" | "manage", value: string) => {
     try {

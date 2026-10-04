@@ -48,3 +48,6 @@ scrollcraft/builds/*/package*.json
 
 # local development bouquet store
 .data/
+
+# brand image candidates (generated; the chosen ones live in src/assets/brand)
+design/brand/candidates/

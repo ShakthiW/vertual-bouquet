@@ -3,9 +3,8 @@ import type { FlowerPlacement } from "@/lib/bouquet/schema";
 import { CATALOG, getColor } from "@/lib/flowers/catalog";
 import { FlowerArt } from "@/lib/flowers/art/flowers";
 import { swayFor } from "@/lib/motion/presets";
-import { headOf, stemOf } from "./geometry";
+import { headOf, LEAF, stemOf } from "./geometry";
 
-const LEAF = "M0 0 C14 -12 36 -12 56 0 C36 9 14 9 0 0Z";
 
 export function colorVars(f: Pick<FlowerPlacement, "type" | "color">): CSSProperties {
   const c = getColor(f.type, f.color);

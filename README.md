@@ -1,4 +1,4 @@
-# Virtual Bouquet
+# Posy
 
 > Some feelings deserve more than a text.
 
@@ -37,3 +37,5 @@ pnpm build
 On Vercel, connect Upstash from the Marketplace (its `*_KV_REST_API_URL` / `*_KV_REST_API_TOKEN` variables are picked up automatically) and deploy. In production, the app refuses to save bouquets without a database rather than losing them.
 
 Fonts are self-hosted (SIL Open Font License): Fraunces, Geist, Caveat, Dancing Script.
+
+The name lives in `src/lib/site.ts`. Brand images (icon, share-card backgrounds) were generated with Gemini; see [`scripts/brand/README.md`](scripts/brand/README.md).

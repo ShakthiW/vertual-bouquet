@@ -30,3 +30,10 @@ export const CARD_FONT_IDS = Object.keys(CARD_FONTS) as [CardFontId, ...CardFont
 
 export const STYLE_IDS = ["romantic", "garden", "ink"] as const;
 export type StyleId = (typeof STYLE_IDS)[number];
+
+/** Stem and leaf greens per style. Mirrors the .bq[data-style] rules in globals.css. */
+export const STYLE_GREENS: Record<StyleId, { leaf: string; leafDark: string; stem: string }> = {
+  romantic: { leaf: "#7f9c74", leafDark: "#5d7a57", stem: "#6c8a5c" },
+  garden: { leaf: "#6f9160", leafDark: "#4f6f45", stem: "#5f7d4f" },
+  ink: { leaf: "#7f9c74", leafDark: "#5d7a57", stem: "#6c8a5c" },
+};

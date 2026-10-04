@@ -8,6 +8,7 @@ import { FlowerIcon } from "@/components/bouquet/Flower";
 import { LIMITS } from "@/lib/bouquet/limits";
 import { GARDEN, ROMANTIC } from "@/lib/bouquet/samples";
 import { CATALOG, FLOWER_IDS, type FlowerId } from "@/lib/flowers/catalog";
+import { SITE } from "@/lib/site";
 
 // The page is a split stage: a flat, cold "text" side on the left and a warm
 // "bouquet" side on the right, separated by a divider that the argument pushes
@@ -117,7 +118,7 @@ export function Landing() {
             <FlowerIcon type="ranunculus" color="peach" className="vb-far__c" />
           </div>
           <div className="vb-hero__head">
-            <p className="vb-wordmark">Virtual Bouquet</p>
+            <p className="vb-wordmark">{SITE.name}</p>
             <h1 className="vb-h1">Some feelings deserve more than a text.</h1>
             <Link className="vb-cta" href={href}>
               {cta}

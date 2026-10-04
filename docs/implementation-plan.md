@@ -337,6 +337,14 @@ Route `/create` (`?to=Name` from the landing page pre-fills the card). Code in `
   - The landing tag input is unaffected, and the reveal suite still passes at phone size.
   - **Not yet:** frame rate on a real mid-range Android, which needs a device.
 
+### Brand: name, icon, share cards ✅
+- **Name: Posy** (a small hand-tied bouquet). It lives in `src/lib/site.ts` (`SITE`), which sets the page titles, wordmarks, manifest and chat titles ("Shakthi sent you a posy 🌷").
+- **Icon:** a bold rose generated with Gemini (`gemini-3-pro-image`) from 4 candidates. It was judged at 16 and 32px, where the alternatives turned to mush. It ships as `icon.png` (192), `apple-icon.png` (180), `favicon.ico` (32) and the manifest icons (192/512). Process and prompts: `scripts/brand/`.
+- **Site share card** (`src/app/opengraph-image.tsx`): a Gemini paper-cut arrangement background with the logo, name, tagline and subline typeset in Fraunces. No text is baked into generated images.
+- **Bouquet share card** (`src/app/b/[id]/opengraph-image.tsx`): **the actual bouquet**, drawn by `bouquetSvg()` (`src/components/bouquet/staticSvg.tsx`), which renders the same art components to standalone SVG with every colour class resolved to fill/stroke attributes, since Satori/resvg can't read our CSS. It sits on a Gemini paper-cut background with "For Maya" (handwriting sized to fit), "with love from Shakthi" and "Sealed with a card. Tap to open." The message stays hidden. Non-Latin names fall back to "For you".
+- **Both cards are converted to JPEG** with `sharp` (`src/lib/og.ts`). Bouquet cards dropped from about 250KB to about 50KB, and the site card from 760KB to 80KB, safely under WhatsApp's roughly 300KB preview limit.
+- **Verified:** 4 real bouquets (romantic, garden with a long name, Ink, and a Sinhala name) rendered and inspected. Tested in dev and in production mode. 69 tests pass. Test data was removed from Upstash.
+
 ### Phase 7: Landing, Polish & QA · **M** (landing page ✅, built early)
 - [x] Landing page: split-stage scroll story (text vs bouquet), name-addressed envelope reveal, collapse close. See `scrollcraft/builds/landing/BRIEF.md`
 - [ ] App icon, favicon, site-wide OG image

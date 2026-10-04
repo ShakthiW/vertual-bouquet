@@ -18,6 +18,7 @@ import { useStudio } from "./StudioProvider";
 import { readiness, STEPS, visualOf, type Step } from "./state";
 import { StepBar, StepProgress } from "./StepBar";
 import { GhostButton, PrimaryButton } from "./ui";
+import { SITE } from "@/lib/site";
 
 const NEXT: Record<Step, string> = {
   flowers: "Arrange them",
@@ -51,7 +52,7 @@ export function Studio() {
           href="/"
           className="justify-self-start font-display text-[0.95rem] whitespace-nowrap italic text-ink-soft transition-colors hover:text-ink sm:text-lg"
         >
-          Virtual Bouquet
+          {SITE.name}
         </Link>
         <div className="min-w-0">
           {draft.sent ? (
