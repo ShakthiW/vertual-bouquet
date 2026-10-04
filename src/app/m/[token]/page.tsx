@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Bouquet } from "@/components/bouquet/Bouquet";
+import { LocalTime } from "@/components/LocalTime";
 import { getByManageToken } from "@/lib/db/bouquets";
 import { DeleteBouquet } from "./DeleteBouquet";
 
@@ -11,9 +12,6 @@ export const metadata: Metadata = {
   // The token is the secret: never leak it to other sites.
   referrer: "no-referrer",
 };
-
-const when = (iso: string) =>
-  new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
 
 export default async function Page({ params }: PageProps<"/m/[token]">) {
   const { token } = await params;
@@ -32,11 +30,21 @@ export default async function Page({ params }: PageProps<"/m/[token]">) {
         <dl className="grid gap-3 text-[0.95rem]">
           <div>
             <dt className="text-sm text-ink-soft">Sent</dt>
-            <dd>{when(b.createdAt)}</dd>
+            <dd>
+              <LocalTime iso={b.createdAt} />
+            </dd>
           </div>
           <div>
             <dt className="text-sm text-ink-soft">Opened</dt>
-            <dd>{b.openedAt ? <>🌷 {when(b.openedAt)}</> : "Not opened yet"}</dd>
+            <dd>
+              {b.openedAt ? (
+                <>
+                  🌷 <LocalTime iso={b.openedAt} />
+                </>
+              ) : (
+                "Not opened yet"
+              )}
+            </dd>
           </div>
         </dl>
 

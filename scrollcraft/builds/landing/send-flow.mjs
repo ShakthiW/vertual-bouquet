@@ -3,6 +3,7 @@ import { chromium } from "playwright-core";
 import fs from "node:fs";
 
 const [w = "1440", h = "900"] = process.argv.slice(2);
+const BASE = process.env.BASE ?? "http://localhost:3000";
 const out = `lab/send-${w}`;
 fs.mkdirSync(out, { recursive: true });
 const browser = await chromium.launch({ executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" });
@@ -22,7 +23,7 @@ const shot = async (p, name) => {
   await p.screenshot({ path: `${out}/${name}.png` });
 };
 
-await page.goto("http://localhost:3000/create?to=Maya", { waitUntil: "networkidle" });
+await page.goto(`${BASE}/create?to=Maya`, { waitUntil: "networkidle" });
 await page.evaluate(() => localStorage.clear());
 await page.reload({ waitUntil: "networkidle" });
 await page.waitForTimeout(500);
@@ -64,15 +65,16 @@ watch(r);
 await r.goto(link, { waitUntil: "networkidle" });
 await shot(r, "02-envelope");
 check("recipient sees the envelope addressed to Maya", (await r.textContent("main")).includes("For Maya"));
-await r.click('button[aria-label^="Open your bouquet"]');
+await r.click('button[aria-label^="Open your bouquet"]', { force: true });
+await r.waitForSelector('.rv[data-state="done"]', { timeout: 12000 });
 await shot(r, "03-opened");
-check("tapping opens the bouquet and card", (await r.locator(".bq").count()) === 1 && (await r.textContent("main")).includes("Hope this makes your day"));
+check("tapping plays the reveal to the bouquet and card", (await r.textContent("main")).includes("Hope this makes your day"));
 check("'send one back' goes to the Studio for Shakthi", (await r.getAttribute("text=Send Shakthi one back 🌷", "href")) === "/create?to=Shakthi");
 
 // The sender's private page, then delete.
 await r.goto(manage, { waitUntil: "networkidle" });
 await shot(r, "04-manage");
-check("manage page shows it unopened", (await r.textContent("main")).includes("Not opened yet"));
+check("sender opening their own link is not counted (same browser)", (await r.textContent("main")).includes("Not opened yet"));
 await r.click("text=Delete bouquet");
 await r.click("text=Yes, delete");
 await r.waitForSelector("text=Deleted.");

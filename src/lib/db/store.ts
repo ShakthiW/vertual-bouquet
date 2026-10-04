@@ -4,11 +4,12 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { Redis } from "@upstash/redis";
 import type { BouquetRecord } from "@/lib/bouquet/schema";
+import { redisCredentials } from "./env";
 
 // Where bouquets live. Two implementations of one small interface:
 //
-//   Upstash Redis   when UPSTASH_REDIS_REST_URL/TOKEN (or the KV_REST_API_*
-//                   names the Vercel Marketplace sets) are present.
+//   Upstash Redis   when credentials are present, under any of the names
+//                   Upstash or the Vercel Marketplace use (see env.ts).
 //   A local file    in development only (.data/bouquets.json), so the app
 //                   runs end to end before any account exists.
 //
@@ -33,9 +34,8 @@ const key = {
 // --- Upstash Redis ---------------------------------------------------------------
 
 function redisFromEnv(): Redis | null {
-  const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
-  return url && token ? new Redis({ url, token }) : null;
+  const creds = redisCredentials();
+  return creds ? new Redis(creds) : null;
 }
 
 class RedisStore implements BouquetStore {
@@ -141,7 +141,7 @@ export function getStore(): BouquetStore {
   if (redis) return (cached = new RedisStore(redis));
   if (process.env.NODE_ENV === "production" && !process.env.VB_ALLOW_FILE_STORE) {
     throw new Error(
-      "No database configured. Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN (or connect Upstash in the Vercel Marketplace).",
+      "No database configured. Connect Upstash in the Vercel Marketplace, or set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN.",
     );
   }
   return (cached = new FileStore(join(process.cwd(), ".data", "bouquets.json")));

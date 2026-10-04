@@ -2,6 +2,7 @@ import "server-only";
 
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import { redisCredentials } from "./env";
 
 // Bouquets per visitor per hour. Generous for people, tight for scripts.
 export const CREATE_LIMIT = { count: 20, windowSeconds: 60 * 60 };
@@ -9,11 +10,10 @@ export const CREATE_LIMIT = { count: 20, windowSeconds: 60 * 60 };
 type Limiter = (key: string) => Promise<{ ok: boolean }>;
 
 function upstashLimiter(): Limiter | null {
-  const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
-  if (!url || !token) return null;
+  const creds = redisCredentials();
+  if (!creds) return null;
   const rl = new Ratelimit({
-    redis: new Redis({ url, token }),
+    redis: new Redis(creds),
     limiter: Ratelimit.slidingWindow(CREATE_LIMIT.count, `${CREATE_LIMIT.windowSeconds} s`),
     prefix: "rl:create",
   });

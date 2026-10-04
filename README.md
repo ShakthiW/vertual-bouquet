@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Virtual Bouquet
 
-## Getting Started
+> Some feelings deserve more than a text.
 
-First, run the development server:
+Make a bouquet of flowers, arrange and wrap it, write a card, and send it as a link. It opens with a sealed envelope, then the bouquet blooms and the card slides in. Free, no accounts, no ads.
+
+- **Idea:** [`docs/idea.md`](docs/idea.md)
+- **How it's built and what's done:** [`docs/implementation-plan.md`](docs/implementation-plan.md)
+
+## Run it locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev            # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Without a database, development saves bouquets to `.data/bouquets.json`. To use Upstash Redis, copy `.env.example` to `.env.local` and fill it in (or `vercel env pull .env.local` if the project is linked to Vercel with Upstash connected).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Page | What it is |
+|---|---|
+| `/` | Landing page (scroll story) |
+| `/create` | The Studio |
+| `/b/<id>` | What the recipient opens |
+| `/m/<token>` | The sender's private page (opened status, delete) |
+| `/dev/playground`, `/dev/arrange` | Development only: flower catalog, arrangement review |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Checks
 
-## Learn More
+```bash
+pnpm test           # unit tests (Vitest)
+pnpm lint
+pnpm build
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+On Vercel, connect Upstash from the Marketplace (its `*_KV_REST_API_URL` / `*_KV_REST_API_TOKEN` variables are picked up automatically) and deploy. In production, the app refuses to save bouquets without a database rather than losing them.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Fonts are self-hosted (SIL Open Font License): Fraunces, Geist, Caveat, Dancing Script.
